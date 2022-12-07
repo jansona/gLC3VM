@@ -8,7 +8,7 @@ import (
 
 func main() {
 	vm := lc3vm.CreateVM()
-	err := vm.LoadImageFromFile("C:\\Users\\jan_s\\Documents\\tomo_pi_mi\\project\\go_learning\\gLC3VM\\program_on_lc3\\2048.obj")
+	err := vm.LoadImageFromFile("C:\\Users\\jan_s\\Documents\\tomo_pi_mi\\project\\go_learning\\gLC3VM\\program_on_lc3\\hangman.obj")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

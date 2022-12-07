@@ -15,4 +15,5 @@ func getChar() rune {
 
 func putChar(char rune) {
 	writer.WriteRune(char)
+	writer.Flush()
 }

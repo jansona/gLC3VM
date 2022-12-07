@@ -37,7 +37,7 @@ func ExeCuteVmInstr(vm *LC3VM, instr uint16) {
 	case OP_STR:
 		opSTR(vm, instr)
 	case OP_TRAP:
-
+		handleTrap(vm, instr)
 	case OP_RES:
 	case OP_RTI:
 	default:

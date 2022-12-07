@@ -1,6 +1,8 @@
 package lc3_vm
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func handleTrap(vm *LC3VM, instr uint16) {
 	vm.WriteRegister(R_R7, vm.ReadRegister(R_PC))
@@ -28,7 +30,6 @@ func trapGETC(vm *LC3VM) {
 
 func trapOUT(vm *LC3VM) {
 	putChar(rune(vm.ReadRegister(R_R0)))
-	// TODO 需要flush stdout吗？
 }
 
 func trapPUTS(vm *LC3VM) {
@@ -37,15 +38,14 @@ func trapPUTS(vm *LC3VM) {
 	for charData != 0x0 {
 		putChar(rune(charData))
 		strAddr++
+		charData = vm.ReadMemory(strAddr)
 	}
-	// TODO 需要flush stdout吗？
 }
 
 func trapIN(vm *LC3VM) {
 	fmt.Println("Enter a character: ")
 	char := getChar()
 	putChar(char)
-	// TODO 需要flush stdout吗？
 	vm.WriteRegister(R_R0, uint16(char))
 	vm.UpdateVmFlag(R_R0)
 }
@@ -59,12 +59,11 @@ func trapPUTSP(vm *LC3VM) {
 			putChar(rune(charData >> 8))
 		}
 		strAddr++
+		charData = vm.ReadMemory(strAddr)
 	}
-	// TODO 需要flush stdout吗？
 }
 
 func trapHALT(vm *LC3VM) {
 	fmt.Println("HALT")
-	// TODO 需要flush stdout吗？
 	vm.status = HALT
 }
