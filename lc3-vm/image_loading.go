@@ -6,25 +6,7 @@ import (
 	"os"
 )
 
-func (vm *LC3VM) LoadImageFromFile(imagePath string) error {
-	file, err := os.Open(imagePath)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	}(file)
-
-	readImageFile(file, vm.memory)
-	return nil
-}
-
-func readImageFile(file *os.File, memory []uint16) {
+func readImageFile(file *os.File, vm *LC3VM) {
 	origin, _ := readWord(file)
 	maxRead := MemoryMax - int(origin)
 
@@ -33,7 +15,7 @@ func readImageFile(file *os.File, memory []uint16) {
 		if cnt != 2 {
 			break
 		}
-		memory[i+int(origin)] = word
+		vm.WriteMemory(uint16(i)+origin, word)
 	}
 }
 

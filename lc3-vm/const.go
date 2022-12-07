@@ -18,6 +18,8 @@ const (
 const (
 	MemoryMax int = 1 << 16
 
+	PC_START = 0x3000
+
 	MR_KBSR = 0xFE00
 	MR_KBDR = 0xFE02
 )
@@ -49,4 +51,18 @@ const (
 	TRAP_IN
 	TRAP_PUTSP
 	TRAP_HALT
+)
+
+// status
+const (
+	FL_POS = 1 << 0
+	FL_ZRO = 1 << 1
+	FL_NEG = 1 << 2
+)
+
+const (
+	INIT = iota
+	RUNNING
+	HALT
+	EXIT
 )
