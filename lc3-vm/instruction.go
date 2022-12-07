@@ -61,7 +61,7 @@ func opADD(vm *LC3VM, instr uint16) {
 	}
 	vm.WriteRegister(r0, result)
 
-	UpdateVmFlag(vm, r0)
+	vm.UpdateVmFlag(r0)
 }
 
 func opAND(vm *LC3VM, instr uint16) {
@@ -79,7 +79,7 @@ func opAND(vm *LC3VM, instr uint16) {
 	}
 	vm.WriteRegister(r0, result)
 
-	UpdateVmFlag(vm, r0)
+	vm.UpdateVmFlag(r0)
 }
 
 func opNOT(vm *LC3VM, instr uint16) {
@@ -87,7 +87,7 @@ func opNOT(vm *LC3VM, instr uint16) {
 	r1 := (instr >> 6) & 0x7
 
 	vm.WriteRegister(r0, ^vm.ReadRegister(r1))
-	UpdateVmFlag(vm, r0)
+	vm.UpdateVmFlag(r0)
 }
 
 func opBR(vm *LC3VM, instr uint16) {
@@ -121,7 +121,7 @@ func opLD(vm *LC3VM, instr uint16) {
 	addr := vm.ReadRegister(R_PC) + pcOffset
 	vm.WriteRegister(r0, vm.ReadMemory(addr))
 
-	UpdateVmFlag(vm, r0)
+	vm.UpdateVmFlag(r0)
 }
 
 func opLDR(vm *LC3VM, instr uint16) {
@@ -131,7 +131,7 @@ func opLDR(vm *LC3VM, instr uint16) {
 	addr := vm.ReadRegister(r1) + offset
 	vm.WriteRegister(r0, vm.ReadMemory(addr))
 
-	UpdateVmFlag(vm, r0)
+	vm.UpdateVmFlag(r0)
 }
 
 func opLEA(vm *LC3VM, instr uint16) {
@@ -140,7 +140,7 @@ func opLEA(vm *LC3VM, instr uint16) {
 	addr := vm.ReadRegister(R_PC) + pcOffset
 	vm.WriteRegister(r0, addr)
 
-	UpdateVmFlag(vm, r0)
+	vm.UpdateVmFlag(r0)
 }
 
 func opST(vm *LC3VM, instr uint16) {
@@ -176,19 +176,7 @@ func opLDI(vm *LC3VM, instr uint16) {
 	finalAddr := vm.ReadMemory(indirectAddr)
 	vm.WriteRegister(r0, vm.ReadMemory(finalAddr))
 
-	UpdateVmFlag(vm, r0)
-}
-
-func UpdateVmFlag(vm *LC3VM, regAddr uint16) {
-	regData := vm.ReadRegister(regAddr)
-	condition := FL_POS
-	switch {
-	case regData == 0:
-		condition = FL_ZRO
-	case regData>>15 != 0:
-		condition = FL_NEG
-	}
-	vm.WriteRegister(R_COND, uint16(condition))
+	vm.UpdateVmFlag(r0)
 }
 
 func signExtend(data uint16, bitWise int) uint16 {

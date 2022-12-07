@@ -1,13 +1,9 @@
 package lc3_vm
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 )
-
-var reader = bufio.NewReader(os.Stdin)
-var writer = bufio.NewWriter(os.Stdout)
 
 type LC3VM struct {
 	memory [MemoryMax]uint16
@@ -73,6 +69,18 @@ func (vm *LC3VM) WriteRegister(addr uint16, data uint16) {
 	vm.reg[addr] = data
 }
 
+func (vm *LC3VM) UpdateVmFlag(regAddr uint16) {
+	regData := vm.ReadRegister(regAddr)
+	condition := FL_POS
+	switch {
+	case regData == 0:
+		condition = FL_ZRO
+	case regData>>15 != 0:
+		condition = FL_NEG
+	}
+	vm.WriteRegister(R_COND, uint16(condition))
+}
+
 func (vm *LC3VM) initialize() {
 
 }
@@ -85,7 +93,7 @@ func (vm *LC3VM) loadInstr(addr uint16) uint16 {
 	if addr == MR_KBSR {
 		if checkKey() != 0 {
 			vm.WriteMemory(MR_KBSR, 1<<15)
-			charByte, _ := reader.ReadByte()
+			charByte := getChar()
 			vm.WriteMemory(MR_KBDR, uint16(charByte))
 		} else {
 			vm.WriteMemory(MR_KBSR, 0)
