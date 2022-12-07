@@ -24,12 +24,18 @@ func handleTrap(vm *LC3VM, instr uint16) {
 }
 
 func trapGETC(vm *LC3VM) {
-	vm.WriteRegister(R_R0, uint16(getChar()))
+	for {
+		if len(vm.keyBuffer) > 0 {
+			break
+		}
+	}
+	vm.WriteRegister(R_R0, uint16(vm.PopKeyBuffer()))
 	vm.UpdateVmFlag(R_R0)
 }
 
 func trapOUT(vm *LC3VM) {
 	putChar(rune(vm.ReadRegister(R_R0)))
+	//fmt.Printf("%c", rune(vm.ReadRegister(R_R0)))
 }
 
 func trapPUTS(vm *LC3VM) {
@@ -44,9 +50,14 @@ func trapPUTS(vm *LC3VM) {
 
 func trapIN(vm *LC3VM) {
 	fmt.Println("Enter a character: ")
-	char := getChar()
-	putChar(char)
+	for {
+		if len(vm.keyBuffer) > 0 {
+			break
+		}
+	}
+	char := vm.PopKeyBuffer()
 	vm.WriteRegister(R_R0, uint16(char))
+	putChar(char)
 	vm.UpdateVmFlag(R_R0)
 }
 

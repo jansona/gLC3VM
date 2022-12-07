@@ -2,24 +2,27 @@ package lc3_vm
 
 import (
 	"fmt"
+	"github.com/nsf/termbox-go"
 	"os"
 )
 
 type LC3VM struct {
-	memory [MemoryMax]uint16
-	reg    [R_COUNT]uint16
-	status int
+	memory    [MemoryMax]uint16
+	reg       [R_COUNT]uint16
+	keyBuffer []rune
+	status    int
 }
 
 func CreateVM() *LC3VM {
 	vm := LC3VM{
-		status: INIT,
+		status:    INIT,
+		keyBuffer: make([]rune, 0),
 	}
 
 	return &vm
 }
 
-func (vm *LC3VM) LoadImageFromFile(imagePath string) error {
+func (vm *LC3VM) LoadImageFromFile(imagePath string, needConvert bool) error {
 	file, err := os.Open(imagePath)
 	if err != nil {
 		fmt.Println(err)
@@ -33,7 +36,7 @@ func (vm *LC3VM) LoadImageFromFile(imagePath string) error {
 		}
 	}(file)
 
-	readImageFile(file, vm)
+	readImageFile(file, vm, needConvert)
 	return nil
 }
 
@@ -45,12 +48,18 @@ func (vm *LC3VM) Run() {
 
 	vm.status = RUNNING
 	for vm.status == RUNNING {
+		vm.handleInput()
+
 		instr := vm.loadInstr(vm.ReadRegister(R_PC))
 		vm.WriteRegister(R_PC, vm.ReadRegister(R_PC)+1)
 		ExeCuteVmInstr(vm, instr)
 	}
 
-	vm.finalize()
+	defer vm.finalize()
+}
+
+func (vm *LC3VM) Terminate() {
+	vm.status = HALT
 }
 
 func (vm *LC3VM) ReadMemory(addr uint16) uint16 {
@@ -81,28 +90,41 @@ func (vm *LC3VM) UpdateVmFlag(regAddr uint16) {
 	vm.WriteRegister(R_COND, uint16(condition))
 }
 
-func (vm *LC3VM) initialize() {
+func (vm *LC3VM) AppendKeyBuffer(key rune) {
+	vm.keyBuffer = append(vm.keyBuffer, key)
+}
 
+func (vm *LC3VM) PopKeyBuffer() rune {
+	key := vm.keyBuffer[0]
+	vm.keyBuffer = vm.keyBuffer[1:]
+	return key
+}
+
+func (vm *LC3VM) initialize() {
+	err := termbox.Init()
+	if err != nil {
+		panic(err)
+	}
+
+	go processInput(vm)
 }
 
 func (vm *LC3VM) finalize() {
+	termbox.Flush()
+	termbox.Close()
+}
 
+func (vm *LC3VM) handleInput() {
+	kbsrVal := vm.ReadMemory(MR_KBSR)
+	if (kbsrVal&0x8000 == 0) && len(vm.keyBuffer) > 0 {
+		vm.WriteMemory(MR_KBSR, kbsrVal|0x8000)
+		vm.WriteMemory(MR_KBDR, uint16(vm.keyBuffer[0]))
+	}
 }
 
 func (vm *LC3VM) loadInstr(addr uint16) uint16 {
-	if addr == MR_KBSR {
-		if checkKey() != 0 {
-			vm.WriteMemory(MR_KBSR, 1<<15)
-			charByte := getChar()
-			vm.WriteMemory(MR_KBDR, uint16(charByte))
-		} else {
-			vm.WriteMemory(MR_KBSR, 0)
-		}
+	if addr == MR_KBDR {
+		vm.WriteMemory(MR_KBSR, vm.ReadMemory(MR_KBSR)&0x7FFF)
 	}
 	return vm.ReadMemory(addr)
-}
-
-// TODO
-func checkKey() uint16 {
-	return 0
 }
