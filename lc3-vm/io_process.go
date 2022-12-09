@@ -2,6 +2,7 @@ package lc3_vm
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/nsf/termbox-go"
 	"os"
 )
@@ -15,8 +16,7 @@ func getChar() rune {
 }
 
 func putChar(char rune) {
-	writer.WriteRune(char)
-	writer.Flush()
+	fmt.Printf("%c", char)
 }
 
 func processInput(vm *LC3VM) {

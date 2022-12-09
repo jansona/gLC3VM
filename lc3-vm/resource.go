@@ -22,7 +22,7 @@ func CreateVM() *LC3VM {
 	return &vm
 }
 
-func (vm *LC3VM) LoadImageFromFile(imagePath string, needConvert bool) error {
+func (vm *LC3VM) LoadImageFromFile(imagePath string) error {
 	file, err := os.Open(imagePath)
 	if err != nil {
 		fmt.Println(err)
@@ -36,7 +36,7 @@ func (vm *LC3VM) LoadImageFromFile(imagePath string, needConvert bool) error {
 		}
 	}(file)
 
-	readImageFile(file, vm, needConvert)
+	readImageFile(file, vm)
 	return nil
 }
 
@@ -110,7 +110,6 @@ func (vm *LC3VM) initialize() {
 }
 
 func (vm *LC3VM) finalize() {
-	termbox.Flush()
 	termbox.Close()
 }
 
