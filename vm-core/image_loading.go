@@ -1,4 +1,4 @@
-package lc3_vm
+package vm_core
 
 import (
 	"bytes"
@@ -30,7 +30,11 @@ func readWord(file *os.File) (uint16, int) {
 		return 0, 0
 	}
 	buffer := bytes.NewBuffer(byteArr)
-	binary.Read(buffer, binary.BigEndian, &word)
+	err = binary.Read(buffer, binary.BigEndian, &word)
+	if err != nil {
+		fmt.Println(err)
+		return 0, 0
+	}
 
 	return word, cnt
 }

@@ -1,4 +1,4 @@
-package lc3_vm
+package vm_core
 
 import (
 	"fmt"
@@ -25,7 +25,6 @@ func CreateVM() *LC3VM {
 func (vm *LC3VM) LoadImageFromFile(imagePath string) error {
 	file, err := os.Open(imagePath)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	defer func(file *os.File) {

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	lc3vm "gLC3VM/lc3-vm"
+	lc3vm "gLC3VM/vm-core"
 	"os"
 )
 

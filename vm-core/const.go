@@ -1,4 +1,4 @@
-package lc3_vm
+package vm_core
 
 // register & memory
 const (
