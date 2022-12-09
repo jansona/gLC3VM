@@ -1,4 +1,8 @@
 *.exe
+*.bin
+*.hex
+*.lst
+*.sym
 go.sum
 test.asm
 test.obj

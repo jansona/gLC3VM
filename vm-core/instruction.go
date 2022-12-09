@@ -51,7 +51,7 @@ func opADD(vm *LC3VM, instr uint16) {
 	r1 := (instr >> 6) & 0x7
 	immFlag := (instr >> 5) & 0x1
 
-	result := vm.ReadMemory(r1)
+	result := vm.ReadRegister(r1)
 	if immFlag != 0 {
 		imm5 := signExtend(instr&0x1F, 5)
 		result += imm5
@@ -119,7 +119,7 @@ func opLD(vm *LC3VM, instr uint16) {
 	r0 := (instr >> 9) & 0x7
 	pcOffset := signExtend(instr&0x1FF, 9)
 	addr := vm.ReadRegister(R_PC) + pcOffset
-	vm.WriteRegister(r0, vm.ReadMemory(addr))
+	vm.WriteRegister(r0, vm.LoadFromMemory(addr))
 
 	vm.UpdateVmFlag(r0)
 }
@@ -129,7 +129,7 @@ func opLDR(vm *LC3VM, instr uint16) {
 	r1 := (instr >> 6) & 0x7
 	offset := signExtend(instr&0x3F, 6)
 	addr := vm.ReadRegister(r1) + offset
-	vm.WriteRegister(r0, vm.ReadMemory(addr))
+	vm.WriteRegister(r0, vm.LoadFromMemory(addr))
 
 	vm.UpdateVmFlag(r0)
 }
@@ -148,16 +148,16 @@ func opST(vm *LC3VM, instr uint16) {
 	pcOffset := signExtend(instr&0x1FF, 9)
 	addr := vm.ReadRegister(R_PC) + pcOffset
 
-	vm.WriteMemory(addr, vm.ReadRegister(r0))
+	vm.StoreInMemory(addr, vm.ReadRegister(r0))
 }
 
 func opSTI(vm *LC3VM, instr uint16) {
 	r0 := (instr >> 9) & 0x7
 	pcOffset := signExtend(instr&0x1FF, 9)
 	indirectAddr := vm.ReadRegister(R_PC) + pcOffset
-	addr := vm.ReadMemory(indirectAddr)
+	addr := vm.LoadFromMemory(indirectAddr)
 
-	vm.WriteMemory(addr, vm.ReadRegister(r0))
+	vm.StoreInMemory(addr, vm.ReadRegister(r0))
 }
 
 func opSTR(vm *LC3VM, instr uint16) {
@@ -166,15 +166,15 @@ func opSTR(vm *LC3VM, instr uint16) {
 	offset := signExtend(instr&0x3F, 6)
 	addr := vm.ReadRegister(r1) + offset
 
-	vm.WriteMemory(addr, vm.ReadRegister(r0))
+	vm.StoreInMemory(addr, vm.ReadRegister(r0))
 }
 
 func opLDI(vm *LC3VM, instr uint16) {
 	r0 := (instr >> 9) & 0x7
 	pcOffset := signExtend(instr&0x1FF, 9)
 	indirectAddr := vm.ReadRegister(R_PC) + pcOffset
-	finalAddr := vm.ReadMemory(indirectAddr)
-	vm.WriteRegister(r0, vm.ReadMemory(finalAddr))
+	finalAddr := vm.LoadFromMemory(indirectAddr)
+	vm.WriteRegister(r0, vm.LoadFromMemory(finalAddr))
 
 	vm.UpdateVmFlag(r0)
 }

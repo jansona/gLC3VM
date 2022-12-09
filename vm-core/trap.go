@@ -40,11 +40,11 @@ func trapOUT(vm *LC3VM) {
 
 func trapPUTS(vm *LC3VM) {
 	strAddr := vm.ReadRegister(R_R0)
-	charData := vm.ReadMemory(strAddr)
+	charData := vm.LoadFromMemory(strAddr)
 	for charData != 0x0 {
 		putChar(rune(charData))
 		strAddr++
-		charData = vm.ReadMemory(strAddr)
+		charData = vm.LoadFromMemory(strAddr)
 	}
 }
 
@@ -63,14 +63,14 @@ func trapIN(vm *LC3VM) {
 
 func trapPUTSP(vm *LC3VM) {
 	strAddr := vm.ReadRegister(R_R0)
-	charData := vm.ReadMemory(strAddr)
+	charData := vm.LoadFromMemory(strAddr)
 	for charData != 0x0 {
 		putChar(rune(charData & 0xFF))
 		if charData>>8 != 0 {
 			putChar(rune(charData >> 8))
 		}
 		strAddr++
-		charData = vm.ReadMemory(strAddr)
+		charData = vm.LoadFromMemory(strAddr)
 	}
 }
 

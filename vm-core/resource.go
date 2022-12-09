@@ -61,12 +61,15 @@ func (vm *LC3VM) Terminate() {
 	vm.status = HALT
 }
 
-func (vm *LC3VM) ReadMemory(addr uint16) uint16 {
-	return vm.memory[addr]
-}
-
-func (vm *LC3VM) WriteMemory(addr uint16, data uint16) {
-	vm.memory[addr] = data
+func (vm *LC3VM) Reset() {
+	for _, idx := range vm.reg {
+		vm.WriteRegister(idx, 0)
+	}
+	for _, idx := range vm.memory {
+		vm.StoreInMemory(idx, 0)
+	}
+	vm.status = INIT
+	vm.keyBuffer = make([]rune, 0)
 }
 
 func (vm *LC3VM) ReadRegister(addr uint16) uint16 {
@@ -75,6 +78,14 @@ func (vm *LC3VM) ReadRegister(addr uint16) uint16 {
 
 func (vm *LC3VM) WriteRegister(addr uint16, data uint16) {
 	vm.reg[addr] = data
+}
+
+func (vm *LC3VM) LoadFromMemory(addr uint16) uint16 {
+	return vm.memory[addr]
+}
+
+func (vm *LC3VM) StoreInMemory(addr uint16, data uint16) {
+	vm.memory[addr] = data
 }
 
 func (vm *LC3VM) UpdateVmFlag(regAddr uint16) {
@@ -113,16 +124,16 @@ func (vm *LC3VM) finalize() {
 }
 
 func (vm *LC3VM) handleInput() {
-	kbsrVal := vm.ReadMemory(MR_KBSR)
+	kbsrVal := vm.LoadFromMemory(MR_KBSR)
 	if (kbsrVal&0x8000 == 0) && len(vm.keyBuffer) > 0 {
-		vm.WriteMemory(MR_KBSR, kbsrVal|0x8000)
-		vm.WriteMemory(MR_KBDR, uint16(vm.keyBuffer[0]))
+		vm.StoreInMemory(MR_KBSR, kbsrVal|0x8000)
+		vm.StoreInMemory(MR_KBDR, uint16(vm.keyBuffer[0]))
 	}
 }
 
 func (vm *LC3VM) loadInstr(addr uint16) uint16 {
 	if addr == MR_KBDR {
-		vm.WriteMemory(MR_KBSR, vm.ReadMemory(MR_KBSR)&0x7FFF)
+		vm.StoreInMemory(MR_KBSR, vm.LoadFromMemory(MR_KBSR)&0x7FFF)
 	}
-	return vm.ReadMemory(addr)
+	return vm.LoadFromMemory(addr)
 }

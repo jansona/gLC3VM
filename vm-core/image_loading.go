@@ -16,7 +16,7 @@ func readImageFile(file *os.File, vm *LC3VM) {
 		if cnt != 2 {
 			break
 		}
-		vm.WriteMemory(uint16(i)+origin, word)
+		vm.StoreInMemory(uint16(i)+origin, word)
 	}
 }
 
