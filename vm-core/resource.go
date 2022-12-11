@@ -62,8 +62,8 @@ func (vm *LC3VM) Terminate() {
 }
 
 func (vm *LC3VM) Reset() {
-	for _, idx := range vm.reg {
-		vm.WriteRegister(idx, 0)
+	for idx, _ := range vm.reg {
+		vm.WriteRegister(uint16(idx), 0)
 	}
 	for _, idx := range vm.memory {
 		vm.StoreInMemory(idx, 0)
